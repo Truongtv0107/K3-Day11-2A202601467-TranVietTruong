@@ -84,13 +84,14 @@ class ConfidenceRouter:
         #      action="escalate", priority="high",
         #      requires_human=True, reason="Low confidence — escalating"
 
-        return RoutingDecision(
-            action="auto_send",
-            confidence=confidence,
-            reason="TODO: implement routing logic",
-            priority="low",
-            requires_human=False,
-        )  # TODO: Replace with implementation
+        confidence = max(0.0, min(1.0, float(confidence)))
+        if action_type in HIGH_RISK_ACTIONS:
+            return RoutingDecision("escalate", confidence, f"High-risk action: {action_type}", "high", True)
+        if confidence >= self.HIGH_THRESHOLD:
+            return RoutingDecision("auto_send", confidence, "High confidence", "low", False)
+        if confidence >= self.MEDIUM_THRESHOLD:
+            return RoutingDecision("queue_review", confidence, "Medium confidence — needs review", "normal", True)
+        return RoutingDecision("escalate", confidence, "Low confidence — escalating", "high", True)
 
 
 # ============================================================
@@ -109,36 +110,9 @@ class ConfidenceRouter:
 # ============================================================
 
 hitl_decision_points = [
-    {
-        "id": 1,
-        "name": "TODO: Name this decision point",
-        "trigger": "TODO: When does this trigger?",
-        "hitl_model": "TODO: human-in-the-loop / human-on-the-loop / human-as-tiebreaker",
-        "context_needed": "TODO: What does the reviewer need to see?",
-        "example": "TODO: Give a concrete example scenario",
-        "approval_path": "TODO: Explain approve, reject and timeout behavior",
-        "audit_fields": "TODO: List correlation ID, intent, diff and reviewer decision",
-    },
-    {
-        "id": 2,
-        "name": "TODO: Name this decision point",
-        "trigger": "TODO: When does this trigger?",
-        "hitl_model": "TODO: human-in-the-loop / human-on-the-loop / human-as-tiebreaker",
-        "context_needed": "TODO: What does the reviewer need to see?",
-        "example": "TODO: Give a concrete example scenario",
-        "approval_path": "TODO: Explain approve, reject and timeout behavior",
-        "audit_fields": "TODO: List correlation ID, intent, diff and reviewer decision",
-    },
-    {
-        "id": 3,
-        "name": "TODO: Name this decision point",
-        "trigger": "TODO: When does this trigger?",
-        "hitl_model": "TODO: human-in-the-loop / human-on-the-loop / human-as-tiebreaker",
-        "context_needed": "TODO: What does the reviewer need to see?",
-        "example": "TODO: Give a concrete example scenario",
-        "approval_path": "TODO: Explain approve, reject and timeout behavior",
-        "audit_fields": "TODO: List correlation ID, intent, diff and reviewer decision",
-    },
+    {"id":1,"name":"High-value money transfer","trigger":"Any transfer above policy threshold, unusual beneficiary, or fraud score elevation.","hitl_model":"human-in-the-loop","context_needed":"Customer intent, amount, beneficiary, fraud signals, authentication state, recent account activity and proposed API payload.","example":"A customer requests a 500,000,000 VND transfer to a newly added beneficiary.","approval_path":"Approve issues a short-lived approval ID; reject cancels the action and explains next steps; timeout defaults to deny and returns the case to the queue.","audit_fields":"correlation_id, user_id, intent, risk score, original request, proposed action diff, reviewer_id, decision, reason, timestamps and approval_id."},
+    {"id":2,"name":"Account closure or identity change","trigger":"Closing an account or changing password, phone, email, address or identity attributes.","hitl_model":"human-as-tiebreaker","context_needed":"Identity verification evidence, requested field diff, active products, holds, disputes and model confidence.","example":"The model is uncertain whether a phone-number change request passed identity verification.","approval_path":"Approve applies only the reviewed diff; reject preserves current data; timeout keeps the account unchanged and escalates to support.","audit_fields":"correlation_id, intent, old/new values as masked diffs, verification checks, reviewer_id, decision, reason and timestamp."},
+    {"id":3,"name":"Low-confidence or policy-exception advice","trigger":"Confidence below 0.9 for consequential advice, conflicting sources, or a request for a policy exception.","hitl_model":"human-on-the-loop","context_needed":"User question, retrieved sources, confidence, draft answer, conflicting evidence and applicable policy.","example":"A customer asks whether a disputed card charge qualifies for an exception outside standard policy.","approval_path":"Reviewer may approve, edit and approve, or reject; timeout sends a neutral holding message and creates a support ticket.","audit_fields":"correlation_id, retrieved source IDs, model confidence, draft/final diff, reviewer decision, edits, reason and SLA timestamps."}
 ]
 
 

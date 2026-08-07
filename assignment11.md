@@ -19,7 +19,7 @@ python -m venv .venv
 .\.venv\Scripts\Activate.ps1
 
 Copy-Item .env.example .env
-# Mở .env, dán GOOGLE_API_KEY — https://aistudio.google.com/apikey
+# Mở .env, dán OPENAI_API_KEY — https://platform.openai.com/api-keys
 
 python -m pip install -U pip
 pip install -r requirements.txt
@@ -29,7 +29,7 @@ Mỗi session mới: `.\.venv\Scripts\Activate.ps1` rồi mới chạy.
 Nếu bị chặn script: `Set-ExecutionPolicy -Scope CurrentUser RemoteSigned`
 
 ```powershell
-$env:GOOGLE_API_KEY="dán-key-của-bạn"   # nếu chưa load từ .env
+$env:OPENAI_API_KEY="dán-key-của-bạn"   # nếu chưa load từ .env
 ```
 
 ---
@@ -98,7 +98,7 @@ Lộ secret trên **unsafe** giúp học / lấy điểm red-team — **không**
 4. `assignment/audit_log.py` + `assignment/monitoring.py`: request ID xuyên suốt input/output; alert theo block rate, rate-limit hits và judge failure rate.
 5. `attacks/attacks.py`: `run_attacks()` chạy target thật. Không thay response bằng transcript tự tạo; report giải thích một attack source-to-sink cụ thể.
 
-Framework: **tự chọn** (Google ADK, LangGraph, NeMo, Guardrails AI, pure Python…). Quan trọng là pipeline và tư duy an toàn.
+Framework: **tự chọn** (OpenAI Responses API, LangGraph, NeMo, Guardrails AI, pure Python…). Quan trọng là pipeline và tư duy an toàn.
 
 ---
 
@@ -130,7 +130,7 @@ Mỗi TODO trong file có docstring + gợi ý — đọc comment trong code tr�
 Câu hỏi người dùng
     → Rate Limiter
     → Input Guardrails (+ NeMo nếu muốn)
-    → LLM (Gemini)
+    → LLM (OpenAI)
     → Output Guardrails + LLM-as-Judge
     → Audit / Monitoring
     → Phản hồi
@@ -230,7 +230,7 @@ Chỉ tham khảo — xem code mẫu RateLimit / Judge / Pure Python DefensePipe
 
 ## 8. Tài liệu tham khảo
 
-- [Google ADK](https://google.github.io/adk-docs/)
+- [OpenAI Responses API](https://google.github.io/adk-docs/)
 - [NeMo Guardrails](https://github.com/NVIDIA/NeMo-Guardrails)
 - [OWASP Top 10 for LLM](https://owasp.org/www-project-top-10-for-large-language-model-applications/)
 - Code lab: `src/`, `notebooks/lab11_guardrails_hitl.ipynb`, `Slide_Lab_Day11.html`

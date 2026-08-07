@@ -1,5 +1,8 @@
 # Day 11 — Controlled Agent Security (2026)
 
+> **Phiên bản nộp của Trần Việt Trường (2A202601467):** Framework đã được chuyển sang **OpenAI Responses API**. Đề bài cho phép tự chọn framework; các contract guardrails, HITL, egress, monitoring và red-team được giữ nguyên.
+
+
 Làm sao để ứng dụng agent an toàn hơn?
 
 **Hình thức:** bài tập **cá nhân** (1 người / 1 MSSV).
@@ -17,7 +20,7 @@ python -m venv .venv
 
 # 2) API key
 Copy-Item .env.example .env
-# Mở .env, dán GOOGLE_API_KEY — lấy tại https://aistudio.google.com/apikey
+# Mở .env, dán OPENAI_API_KEY — lấy tại https://platform.openai.com/api-keys
 
 # 3) Cài dependency trong venv
 python -m pip install -U pip
@@ -32,7 +35,7 @@ Nếu PowerShell báo không cho chạy script:
 PowerShell (nếu chưa load `.env`):
 
 ```powershell
-$env:GOOGLE_API_KEY="dán-key-của-bạn"
+$env:OPENAI_API_KEY="dán-key-của-bạn"
 ```
 
 ---
@@ -66,7 +69,7 @@ Hình thức: **cá nhân** (1 người / 1 MSSV). Luồng: **Setup → A → Br
 
 | # | Phần | Nội dung | Thời lượng |
 |---|------|----------|-----------:|
-| 0 | **Setup** | Cài đặt môi trường (`pip`, `GOOGLE_API_KEY`, chạy local) | 30' |
+| 0 | **Setup** | Cài đặt môi trường (`pip`, `OPENAI_API_KEY`, chạy local) | 30' |
 | 1 | **A · Phòng thủ** | 2A Input · 2B Output · 2C NeMo · Part 3 Testing · Part 4 HITL | 120' |
 | — | **Break** | Nghỉ giải lao | 10' |
 | 2 | **B · Tấn công** | Tấn công **Unsafe** (điểm B) + **Guards** (điểm cộng nếu LEAKED) | 60' |
@@ -187,5 +190,59 @@ Nộp theo [`SUBMISSION.md`](SUBMISSION.md).
 
 - [OWASP Top 10 for LLM](https://owasp.org/www-project-top-10-for-large-language-model-applications/)
 - [NeMo Guardrails](https://github.com/NVIDIA/NeMo-Guardrails)
-- [Google ADK](https://google.github.io/adk-docs/)
+- [OpenAI API](https://platform.openai.com/docs/)
 - [AI Safety Fundamentals](https://aisafetyfundamentals.com/)
+
+---
+
+## Thông tin bài nộp
+
+- **Học viên:** Trần Việt Trường
+- **Mã học viên:** 2A202601467
+
+### Chạy kiểm thử
+
+```bash
+pip install -r requirements.txt
+pytest tests/smoke -q
+pytest tests/public -q
+```
+
+### Sinh kết quả phòng thủ
+
+```bash
+cd src
+STUDENT_ID=2A202601467 python main.py --part 5
+```
+
+### Chạy red-team bằng OpenAI
+
+Tạo `.env` từ `.env.example`, thêm `OPENAI_API_KEY`, sau đó:
+
+```bash
+cd src
+python main.py --part 1
+```
+
+Không commit API key lên GitHub.
+
+## Bản sửa ổn định
+
+- `.env` được đọc từ thư mục gốc dù chạy lệnh trong `src/`.
+- Part 3 sử dụng cùng hardened guard agent như Part 1 và phân loại chính xác `LEAKED`, `BLOCKED`, `REFUSED`, `SAFE`.
+- Security pipeline chạy cả unprotected và protected agent.
+- NeMo có fallback xác định để không làm hỏng toàn bộ lab khi phiên bản Colang/NeMo không tương thích.
+- Chạy không có `--part` sẽ thực hiện đủ Part 1 đến Part 5.
+
+```bash
+cp .env.example .env
+python3 -m pip install -r requirements.txt
+cd src
+python3 main.py
+```
+
+## Ngôn ngữ trợ lý
+
+- Bot trả lời bằng tiếng Việt nhưng không thêm dữ liệu nghiệp vụ ngoài đề lab.
+- Các câu hỏi lãi suất, phí, hạn mức chỉ nhận hướng dẫn tổng quát và yêu cầu kiểm tra kênh chính thức; không tự bịa số liệu.
+- Email/RAG/web/tool output luôn là dữ liệu không tin cậy, đúng contract của bài.

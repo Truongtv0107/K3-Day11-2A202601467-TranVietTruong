@@ -183,7 +183,7 @@ Khớp `[schemas/results.schema.json](schemas/results.schema.json)`. Ví dụ:
 ```json
 {
   "student_id": "SE12345",
-  "framework": "google-adk | langgraph | nemo | pure-python | other",
+  "framework": "openai-responses | langgraph | nemo | pure-python | other",
   "safe_queries": [
     {"input": "...", "blocked": false, "layer": null, "response_preview": "..."}
   ],

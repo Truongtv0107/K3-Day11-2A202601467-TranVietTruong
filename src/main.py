@@ -108,6 +108,7 @@ async def part3_testing():
 
     from testing.testing import run_comparison, print_comparison, SecurityTestPipeline
     from agents.agent import create_unsafe_agent
+    from agents.guards_agent import create_guards_agent
 
     # TODO 9: Before vs after comparison
     print("\n--- TODO 9: Before/After Comparison ---")
@@ -117,15 +118,18 @@ async def part3_testing():
     else:
         print("Complete TODO 9 to see the comparison.")
 
-    # TODO 10: Automated security pipeline
-    print("\n--- TODO 10: Security Test Pipeline ---")
-    agent, runner = create_unsafe_agent()
-    pipeline = SecurityTestPipeline(agent, runner)
-    results = await pipeline.run_all()
-    if results:
-        pipeline.print_report(results)
-    else:
-        print("Complete TODO 10 to see the pipeline report.")
+    # TODO 10: Automated security pipeline on both baselines.
+    print("\n--- TODO 10A: Security Pipeline — Unprotected ---")
+    unsafe_agent, unsafe_runner = create_unsafe_agent()
+    unsafe_pipeline = SecurityTestPipeline(unsafe_agent, unsafe_runner)
+    unsafe_results = await unsafe_pipeline.run_all()
+    unsafe_pipeline.print_report(unsafe_results)
+
+    print("\n--- TODO 10B: Security Pipeline — Protected ---")
+    protected_agent, protected_runner = create_guards_agent()
+    protected_pipeline = SecurityTestPipeline(protected_agent, protected_runner)
+    protected_results = await protected_pipeline.run_all()
+    protected_pipeline.print_report(protected_results)
 
 
 def part4_hitl():
@@ -188,7 +192,7 @@ async def main(parts=None):
     setup_api_key()
 
     if parts is None:
-        parts = [1, 2, 3, 4]
+        parts = [1, 2, 3, 4, 5]
 
     for part in parts:
         if part == 1:
